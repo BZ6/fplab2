@@ -1,4 +1,4 @@
-module Tests
+module UTests
 
 open Xunit
 open FsCheck
