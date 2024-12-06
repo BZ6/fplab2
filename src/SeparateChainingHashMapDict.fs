@@ -1,5 +1,7 @@
 module SeparateChainingHashMapDict
 
+// TODO: Написать комменты и проверить чтобы все работало
+
 type SeparateChainingHashMap<'Key, 'Value when 'Key: comparison> =
     { Capacity: int
       Table: ('Key * 'Value) list array

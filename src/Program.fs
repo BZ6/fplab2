@@ -9,6 +9,8 @@ let printTimeFunc message f num =
     printfn "%s %A" message result
     printfn "Time taken: %A ms" stopwatch.ElapsedMilliseconds
 
+// TODO: Поменять main (например заюзать printTimeFunc)
+
 [<EntryPoint>]
 let main argv =
     // Create an empty hash map

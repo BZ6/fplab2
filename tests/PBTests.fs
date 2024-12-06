@@ -49,3 +49,5 @@ let ``Merging two maps should combine their values`` (pairs1: (int * int) list) 
     let sortedMergedValues = List.sort mergedValues
     let sortedExpectedValues = List.sort expectedValues
     Assert.Equal<(int * int) list>(sortedExpectedValues, sortedMergedValues)
+
+// TODO: Написать еще тестов

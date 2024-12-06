@@ -64,3 +64,5 @@ let ``Merge Maps`` () =
     let values = foldL (fun acc (k, v) -> (k, v) :: acc) [] mergedMap
     let expectedValues = [(2, "value2"); (1, "value1")]
     Assert.Equal<(int * string) list>(expectedValues, values)
+
+// TODO: Написать еще тестов
