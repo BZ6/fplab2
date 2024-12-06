@@ -11,50 +11,50 @@ let printTimeFunc message f num =
 
 [<EntryPoint>]
 let main argv =
-    // Создаем пустую хеш-таблицу с начальной емкостью 10
+    // Create an empty hash map
     let map = createEmpty 10
 
-    // Добавляем несколько элементов
+    // Add some elements
     let map = add "key1" "value1" map
     let map = add "key2" "value2" map
     let map = add "key3" "value3" map
     let map = add "key4" "value4" map
 
-    // Получаем значения по ключам
+    // Get values by keys
     let value1 = getValue "key1" map
     let value2 = getValue "key2" map
     let value3 = getValue "key3" map
     let value4 = getValue "key4" map
 
-    // Выводим значения
+    // Output the values
     printfn "Value for 'key1': %A" value1
     printfn "Value for 'key2': %A" value2
     printfn "Value for 'key3': %A" value3
     printfn "Value for 'key4': %A" value4
 
-    // Удаляем элемент
+    // Remove an element
     let map = remove "key2" map
 
-    // Получаем значение после удаления
+    // Get value after removal
     let value2AfterRemove = getValue "key2" map
     printfn "Value for 'key2' after removal: %A" value2AfterRemove
 
-    // Фильтруем элементы
+    // Filter elements
     let filteredMap = filter (fun (k: string, v: string) -> k.StartsWith "key") map
 
-    // Выводим отфильтрованные значения
+    // Output the filtered values
     let filteredValues = foldL (fun acc (k, v) -> (k, v) :: acc) [] filteredMap
     printfn "Filtered values: %A" filteredValues
 
-    // Проверяем слияние двух хеш-таблиц
+    // Check the merging of two hash tables
     let map2 = createEmpty 10
     let map2 = add "key5" "value5" map2
     let map2 = add "key6" "value6" map2
 
     let mergedMap = merge map map2
 
-    // Выводим значения после слияния
+    // Output the values after merging
     let mergedValues = foldL (fun acc (k, v) -> (k, v) :: acc) [] mergedMap
     printfn "Merged values: %A" mergedValues
 
-    0 // Возвращаем 0 для успешного завершения программы
+    0

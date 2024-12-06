@@ -28,7 +28,6 @@ let ``Filtering should return the correct values`` (pairs: (string * string) lis
     let filteredMap = filter (fun (k, v) -> k = "key") map
     let filteredValues = foldL (fun acc (k, v) -> (k, v) :: acc) [] filteredMap
     let expectedValues = List.filter (fun (k, v) -> k = "key") pairs
-    // Сортируем списки перед сравнением
     let sortedFilteredValues = List.sort filteredValues
     let sortedExpectedValues = List.sort expectedValues
     Assert.Equal<(string * string) list>(sortedExpectedValues, sortedFilteredValues)
@@ -42,13 +41,11 @@ let ``Merging two maps should combine their values`` (pairs1: (int * int) list) 
     let mergedMap = merge map1 map2
     let mergedValues = foldL (fun acc (k, v) -> (k, v) :: acc) [] mergedMap
 
-    // Ensure values from the second map overwrite values from the first map
     let expectedValues =
         pairs2 @ (List.filter (fun (k, _) -> not (List.exists (fun (k2, _) -> k = k2) pairs2)) pairs1)
         |> List.rev
-        |> List.distinctBy fst // Удаляем дубликаты ключей
+        |> List.distinctBy fst
 
-    // Сортируем списки перед сравнением
     let sortedMergedValues = List.sort mergedValues
     let sortedExpectedValues = List.sort expectedValues
     Assert.Equal<(int * int) list>(sortedExpectedValues, sortedMergedValues)
