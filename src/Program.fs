@@ -9,54 +9,58 @@ let printTimeFunc message f num =
     printfn "%s %A" message result
     printfn "Time taken: %A ms" stopwatch.ElapsedMilliseconds
 
-// TODO: Поменять main (например заюзать printTimeFunc)
-
 [<EntryPoint>]
 let main argv =
     // Create an empty hash map
+    printfn "Create an empty hash map:"
+    printTimeFunc "Create empty:" (fun _ -> createEmpty 10) 0
     let map = createEmpty 10
 
     // Add some elements
+    printfn "Add some elements:"
+    printTimeFunc "Add key1:" (fun _ -> add "key1" "value1" map) 0
     let map = add "key1" "value1" map
+    printTimeFunc "Add key2:" (fun _ -> add "key2" "value2" map) 0
     let map = add "key2" "value2" map
+    printTimeFunc "Add key3:" (fun _ -> add "key3" "value3" map) 0
     let map = add "key3" "value3" map
+    printTimeFunc "Add key4:" (fun _ -> add "key4" "value4" map) 0
     let map = add "key4" "value4" map
 
     // Get values by keys
+    printfn "Get values by keys:"
+    printTimeFunc "Get value1:" (fun _ -> getValue "key1" map) 0
     let value1 = getValue "key1" map
+    printTimeFunc "Get value2:" (fun _ -> getValue "key2" map) 0
     let value2 = getValue "key2" map
+    printTimeFunc "Get value3:" (fun _ -> getValue "key3" map) 0
     let value3 = getValue "key3" map
+    printTimeFunc "Get value4:" (fun _ -> getValue "key4" map) 0
     let value4 = getValue "key4" map
 
-    // Output the values
-    printfn "Value for 'key1': %A" value1
-    printfn "Value for 'key2': %A" value2
-    printfn "Value for 'key3': %A" value3
-    printfn "Value for 'key4': %A" value4
-
     // Remove an element
+    printfn "Remove an element:"
+    printTimeFunc "Remove key2:" (fun _ -> remove "key2" map) 0
     let map = remove "key2" map
 
     // Get value after removal
+    printfn "Get value after removal:"
+    printTimeFunc "Get value2 after removal:" (fun _ -> getValue "key2" map) 0
     let value2AfterRemove = getValue "key2" map
-    printfn "Value for 'key2' after removal: %A" value2AfterRemove
 
     // Filter elements
-    let filteredMap = filter (fun (k: string, v: string) -> k.StartsWith "key") map
-
-    // Output the filtered values
-    let filteredValues = foldL (fun acc (k, v) -> (k, v) :: acc) [] filteredMap
-    printfn "Filtered values: %A" filteredValues
+    printfn "Filter elements:"
+    printTimeFunc "Filter key1:" (fun _ -> filter (fun (k: string, v: string) -> k.StartsWith "key1") map) 0
+    let filteredMap = filter (fun (k: string, v: string) -> k.StartsWith "key1") map
 
     // Check the merging of two hash tables
+    printfn "Check the merging of two hash tables:"
     let map2 = createEmpty 10
+    printTimeFunc "Add key5 to map2:" (fun _ -> add "key5" "value5" map2) 0
     let map2 = add "key5" "value5" map2
+    printTimeFunc "Add key6 to map2:" (fun _ -> add "key6" "value6" map2) 0
     let map2 = add "key6" "value6" map2
-
+    printTimeFunc "Merge maps:" (fun _ -> merge map map2) 0
     let mergedMap = merge map map2
-
-    // Output the values after merging
-    let mergedValues = foldL (fun acc (k, v) -> (k, v) :: acc) [] mergedMap
-    printfn "Merged values: %A" mergedValues
 
     0

@@ -1,16 +1,17 @@
 module SeparateChainingHashMapDict
 
-// TODO: Написать комменты и проверить чтобы все работало
-
+// Define the SeparateChainingHashMap type
 type SeparateChainingHashMap<'Key, 'Value when 'Key: comparison> =
     { Capacity: int
       Table: ('Key * 'Value) list array
       Size: int }
 
+// Compute the hash for a given key
 let hash (capacity: int) (key: 'Key) : int =
     (hash key) % capacity
     |> (fun x -> if x < 0 then x + capacity else x)
 
+// Add a key-value pair to the map
 let add
     (key: 'Key)
     (value: 'Value)
@@ -19,6 +20,7 @@ let add
     let index = hash map.Capacity key
     let newTable = Array.copy map.Table
 
+    // Update the list at the hashed index
     let updateList (list: ('Key * 'Value) list) : ('Key * 'Value) list * bool =
         match list with
         | [] -> [(key, value)], true
@@ -32,6 +34,7 @@ let add
     let updatedList, added = updateList newTable.[index]
     newTable.[index] <- updatedList
 
+    // Resize the map if necessary
     let resizedMap =
         if (map.Size + 1) > map.Capacity * 3 / 4 then { map with Table = newTable }
         else { map with Table = newTable }
@@ -39,16 +42,19 @@ let add
     { resizedMap with
         Size = if added then resizedMap.Size + 1 else resizedMap.Size }
 
+// Remove a key-value pair from the map
 let remove (key: 'Key) (map: SeparateChainingHashMap<'Key, 'Value>) : SeparateChainingHashMap<'Key, 'Value> =
     let index = hash map.Capacity key
     let newTable = Array.copy map.Table
 
+    // Determine the new size after removal
     let newSize =
         let existingEntry = List.tryFind (fun (k, _) -> k = key) newTable.[index]
         match existingEntry with
         | Some _ -> map.Size - 1
         | None -> map.Size
 
+    // Update the list at the hashed index
     let updateList (list: ('Key * 'Value) list) : ('Key * 'Value) list =
         list |> List.filter (fun (k, _) -> k <> key)
 
@@ -58,6 +64,7 @@ let remove (key: 'Key) (map: SeparateChainingHashMap<'Key, 'Value>) : SeparateCh
         Table = newTable
         Size = newSize }
 
+// Get the value associated with a key
 let getValue (key: 'Key) (map: SeparateChainingHashMap<'Key, 'Value>) : 'Value option =
     let index = hash map.Capacity key
 
@@ -65,6 +72,7 @@ let getValue (key: 'Key) (map: SeparateChainingHashMap<'Key, 'Value>) : 'Value o
     |> List.tryFind (fun (k, _) -> k = key)
     |> Option.map snd
 
+// Filter the map based on a predicate
 let filter
     (predicate: ('Key * 'Value) -> bool)
     (map: SeparateChainingHashMap<'Key, 'Value>)
@@ -79,6 +87,7 @@ let filter
 
     List.fold (fun acc (k, v) -> add k v acc) newDict filteredItems
 
+// Apply a function to each key-value pair in the map
 let map
     (mapper: ('Key * 'Value) -> ('Key * 'Value))
     (map: SeparateChainingHashMap<'Key, 'Value>)
@@ -101,6 +110,7 @@ let map
 
     { map with Table = updatedTable }
 
+// Fold the map from left to right
 let foldL
     (folder: 'State -> ('Key * 'Value) -> 'State)
     (state: 'State)
@@ -108,6 +118,7 @@ let foldL
     : 'State =
     Array.fold (fun acc list -> List.fold folder acc list) state map.Table
 
+// Fold the map from right to left
 let foldR
     (folder: ('Key * 'Value) -> 'State -> 'State)
     (state: 'State)
@@ -115,11 +126,13 @@ let foldR
     : 'State =
     Array.foldBack (fun list acc -> List.foldBack folder list acc) map.Table state
 
+// Create an empty map with a given capacity
 let createEmpty (capacity: int) : SeparateChainingHashMap<'Key, 'Value> =
     { Capacity = capacity
       Table = Array.create capacity []
       Size = 0 }
 
+// Merge two maps into one
 let merge
     (dict1: SeparateChainingHashMap<'Key, 'Value>)
     (dict2: SeparateChainingHashMap<'Key, 'Value>)
