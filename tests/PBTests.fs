@@ -42,7 +42,8 @@ let ``Merging two maps should combine their values`` (pairs1: (int * int) list) 
     let mergedValues = foldL (fun acc (k, v) -> (k, v) :: acc) [] mergedMap
 
     let expectedValues =
-        pairs2 @ (List.filter (fun (k, _) -> not (List.exists (fun (k2, _) -> k = k2) pairs2)) pairs1)
+        pairs2
+        @ (List.filter (fun (k, _) -> not (List.exists (fun (k2, _) -> k = k2) pairs2)) pairs1)
         |> List.rev
         |> List.distinctBy fst
 

@@ -23,9 +23,10 @@ let add
     // Update the list at the hashed index
     let updateList (list: ('Key * 'Value) list) : ('Key * 'Value) list * bool =
         match list with
-        | [] -> [(key, value)], true
+        | [] -> [ (key, value) ], true
         | _ ->
             let exists = List.exists (fun (k, _) -> k = key) list
+
             if exists then
                 (List.map (fun (k, v) -> if k = key then (key, value) else (k, v)) list, false)
             else
@@ -36,11 +37,17 @@ let add
 
     // Resize the map if necessary
     let resizedMap =
-        if (map.Size + 1) > map.Capacity * 3 / 4 then { map with Table = newTable }
-        else { map with Table = newTable }
+        if (map.Size + 1) > map.Capacity * 3 / 4 then
+            { map with Table = newTable }
+        else
+            { map with Table = newTable }
 
     { resizedMap with
-        Size = if added then resizedMap.Size + 1 else resizedMap.Size }
+        Size =
+            if added then
+                resizedMap.Size + 1
+            else
+                resizedMap.Size }
 
 // Remove a key-value pair from the map
 let remove (key: 'Key) (map: SeparateChainingHashMap<'Key, 'Value>) : SeparateChainingHashMap<'Key, 'Value> =
@@ -50,6 +57,7 @@ let remove (key: 'Key) (map: SeparateChainingHashMap<'Key, 'Value>) : SeparateCh
     // Determine the new size after removal
     let newSize =
         let existingEntry = List.tryFind (fun (k, _) -> k = key) newTable.[index]
+
         match existingEntry with
         | Some _ -> map.Size - 1
         | None -> map.Size
@@ -141,15 +149,6 @@ let merge
     let newMap = createEmpty newCapacity
 
     let addAll (map1: SeparateChainingHashMap<'Key, 'Value>) (map2: SeparateChainingHashMap<'Key, 'Value>) =
-        Array.fold
-            (fun updatedMap list ->
-                List.fold
-                    (fun acc (k, v) -> add k v acc)
-                    updatedMap
-                    list)
-            map2
-            map1.Table
+        Array.fold (fun updatedMap list -> List.fold (fun acc (k, v) -> add k v acc) updatedMap list) map2 map1.Table
 
-    newMap
-    |> addAll dict1
-    |> addAll dict2
+    newMap |> addAll dict1 |> addAll dict2
