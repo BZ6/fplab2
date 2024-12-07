@@ -65,4 +65,9 @@ let ``Merge Maps`` () =
     let expectedValues = [(2, "value2"); (1, "value1")]
     Assert.Equal<(int * string) list>(expectedValues, values)
 
-// TODO: Написать еще тестов
+[<Fact>]
+let ``Create Empty Map`` () =
+    let map = createEmpty 10
+    Assert.Equal(10, map.Capacity)
+    Assert.Equal(0, map.Size)
+    Assert.True(Array.forall List.isEmpty map.Table)

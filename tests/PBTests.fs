@@ -50,4 +50,25 @@ let ``Merging two maps should combine their values`` (pairs1: (int * int) list) 
     let sortedExpectedValues = List.sort expectedValues
     Assert.Equal<(int * int) list>(sortedExpectedValues, sortedMergedValues)
 
+[<Property>]
+let ``Adding the same key twice should update the value`` (key: string) (value1: string) (value2: string) =
+    let map = createEmpty 10
+    let map = add key value1 map
+    let map = add key value2 map
+    let result = getValue key map
+    Assert.Equal(Some value2, result)
+
+[<Property>]
+let ``Adding multiple values should increase the size`` (pairs: (string * string) list) =
+    let map = createEmpty 10
+    let map = List.fold (fun map (key, value) -> add key value map) map pairs
+    let expectedSize = List.length (List.distinctBy fst pairs)
+    Assert.Equal(expectedSize, map.Size)
+
+[<Property>]
+let ``Filtering an empty map should return an empty map`` () =
+    let map = createEmpty 10
+    let filteredMap = filter (fun _ -> true) map
+    Assert.Equal(0, filteredMap.Size)
+
 // TODO: Написать еще тестов
