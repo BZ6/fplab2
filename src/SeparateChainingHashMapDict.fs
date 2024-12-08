@@ -104,9 +104,9 @@ let map
 
     let updatedTable =
         Array.fold
-            (fun (table: ('Key * 'Value) list array) list ->
+            (fun (table: ('Key * 'Value) list array) list -> 
                 List.fold
-                    (fun (table: ('Key * 'Value) list array) (k, v) ->
+                    (fun (table: ('Key * 'Value) list array) (k, v) -> 
                         let (newK, newV) = mapper (k, v)
                         let index = hash map.Capacity newK
                         table.[index] <- (newK, newV) :: table.[index]
@@ -152,3 +152,24 @@ let merge
         Array.fold (fun updatedMap list -> List.fold (fun acc (k, v) -> add k v acc) updatedMap list) map2 map1.Table
 
     newMap |> addAll dict1 |> addAll dict2
+
+// Compare two SeparateChainingHashMap instances
+let compare
+    (map1: SeparateChainingHashMap<'Key, 'Value>)
+    (map2: SeparateChainingHashMap<'Key, 'Value>)
+    : bool =
+    if map1.Size <> map2.Size then
+        false
+    else
+        let compareLists list1 list2 =
+            let rec compareElements l1 l2 =
+                match l1, l2 with
+                | [], [] -> true
+                | (k1, v1) :: t1, _ ->
+                    match List.tryFind (fun (k2, v2) -> k1 = k2 && v1 = v2) l2 with
+                    | Some _ -> compareElements t1 (List.filter (fun (k2, _) -> k1 <> k2) l2)
+                    | None -> false
+                | _ -> false
+            compareElements list1 list2
+
+        Array.forall2 compareLists map1.Table map2.Table

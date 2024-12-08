@@ -84,3 +84,20 @@ let ``Create Empty Map`` () =
     Assert.Equal(10, map.Capacity)
     Assert.Equal(0, map.Size)
     Assert.True(Array.forall List.isEmpty map.Table)
+
+[<Fact>]
+let ``Compare Maps`` () =
+    let map1 = createEmpty 10
+    let map1 = add "key1" "value1" map1
+    let map1 = add "key2" "value2" map1
+
+    let map2 = createEmpty 10
+    let map2 = add "key1" "value1" map2
+    let map2 = add "key2" "value2" map2
+
+    let map3 = createEmpty 10
+    let map3 = add "key1" "value1" map3
+    let map3 = add "key3" "value3" map3
+
+    Assert.True(compare map1 map2)
+    Assert.False(compare map1 map3)
