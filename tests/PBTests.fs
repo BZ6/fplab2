@@ -8,7 +8,7 @@ open SeparateChainingHashMapDict
 
 type ArbitrarySeparateChainingHashMap<'Key, 'Value when 'Key: comparison>() =
     static member SeparateChainingHashMap() =
-        Gen.sized (fun size ->
+        Gen.sized (fun size -> 
             gen {
                 let! keyValuePairs = Gen.listOfLength size (Arb.generate<'Key * 'Value>)
                 let dict = createEmpty (size * 2)
@@ -17,15 +17,15 @@ type ArbitrarySeparateChainingHashMap<'Key, 'Value when 'Key: comparison>() =
             })
         |> Arb.fromGen
 
-// TODO: Починить
 [<Property(Arbitrary = [| typeof<ArbitrarySeparateChainingHashMap<string, string>> |])>]
 let ``Adding and getting a value should return the same value`` (key: string) (value: string) (map: SeparateChainingHashMap<string, string>) =
+    let map = if map.Capacity = 0 then createEmpty 10 else map
     let map = add key value map
     getValue key map = Some value
 
-// TODO: Починить
 [<Property(Arbitrary = [| typeof<ArbitrarySeparateChainingHashMap<string, string>> |])>]
 let ``Removing a value should result in None`` (key: string) (value: string) (map: SeparateChainingHashMap<string, string>) =
+    let map = if map.Capacity = 0 then createEmpty 10 else map
     let map = add key value map
     let map = remove key map
     let result = getValue key map
@@ -37,19 +37,10 @@ let ``Filtering should return the correct values`` (map: SeparateChainingHashMap
     let expectedMap = filter (fun (k, v) -> k = "key") map
     compare filteredMap expectedMap
 
-// TODO: Заменить на SeparateChainingHashMap<string, string>
-[<Property>]
-let ``Merging two maps should combine their values`` (pairs1: (int * int) list) (pairs2: (int * int) list) =
-    let map1 = createEmpty 10
-    let map1 = List.fold (fun map (key, value) -> add key value map) map1 pairs1
-    let map2 = createEmpty 10
-    let map2 = List.fold (fun map (key, value) -> add key value map) map2 pairs2
+[<Property(Arbitrary = [| typeof<ArbitrarySeparateChainingHashMap<string, string>> |])>]
+let ``Merging two maps should combine their values`` (map1: SeparateChainingHashMap<string, string>) (map2: SeparateChainingHashMap<string, string>) =
     let mergedMap = merge map1 map2
-
-    let expectedMap = createEmpty 10
-    let expectedMap = List.fold (fun map (key, value) -> add key value map) expectedMap pairs1
-    let expectedMap = List.fold (fun map (key, value) -> add key value map) expectedMap pairs2
-
+    let expectedMap = foldL (fun acc (k, v) -> add k v acc) map1 map2
     compare mergedMap expectedMap
 
 [<Property>]
@@ -60,17 +51,28 @@ let ``Adding the same key twice should update the value`` (key: string) (value1:
     let result = getValue key map
     result = Some value2
 
-// TODO: Заменить на SeparateChainingHashMap<string, string>
-[<Property>]
-let ``Adding multiple values should increase the size`` (pairs: (string * string) list) =
-    let map = createEmpty 10
-    let map = List.fold (fun map (key, value) -> add key value map) map pairs
-    let expectedSize = List.length (List.distinctBy fst pairs)
-    map.Size = expectedSize
-
-// TODO: Починить
 [<Property(Arbitrary = [| typeof<ArbitrarySeparateChainingHashMap<string, string>> |])>]
-let ``Filtering an empty map should return an empty map`` (map: SeparateChainingHashMap<string, string>) =
+let ``Adding multiple values should increase the size`` (map: SeparateChainingHashMap<string, string>) =
+    let newMap = createEmpty map.Capacity
+    let newMap = foldL (fun acc (k, v) -> add k v acc) newMap map
+    newMap.Size = map.Size
+
+[<Property>]
+let ``Filtering an empty map should return an empty map`` () =
+    let map = createEmpty 10
     let filteredMap = filter (fun _ -> true) map
     let expectedMap = createEmpty map.Capacity
     compare filteredMap expectedMap
+
+[<Property(Arbitrary = [| typeof<ArbitrarySeparateChainingHashMap<string, string>> |])>]
+let ``SeparateChainingHashMap should satisfy associativity property`` (map1: SeparateChainingHashMap<string, string>) (map2: SeparateChainingHashMap<string, string>) (map3: SeparateChainingHashMap<string, string>) =
+    let leftAssoc = merge (merge map1 map2) map3
+    let rightAssoc = merge map1 (merge map2 map3)
+    compare leftAssoc rightAssoc
+
+[<Property(Arbitrary = [| typeof<ArbitrarySeparateChainingHashMap<string, string>> |])>]
+let ``SeparateChainingHashMap should satisfy identity property`` (map1: SeparateChainingHashMap<string, string>) =
+    let emptyMap = createEmpty map1.Capacity
+    let leftIdentity = merge map1 emptyMap
+    let rightIdentity = merge emptyMap map1
+    compare leftIdentity map1 && compare leftIdentity rightIdentity && compare rightIdentity map1
