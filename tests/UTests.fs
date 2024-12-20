@@ -6,12 +6,17 @@ open FsCheck.Xunit
 
 open SeparateChainingHashMapDict
 
+let ifEqual expected actual =
+    if expected <> actual then
+        failwithf "Expected: %A but got: %A" expected actual
+
 [<Fact>]
 let ``Add and Get Value`` () =
     let map = createEmpty 10
     let map = add "key1" "value1" map
     let value = getValue "key1" map
-    Assert.Equal(Some "value1", value)
+
+    ifEqual (Some "value1") value
 
 [<Fact>]
 let ``Remove Value`` () =
@@ -19,7 +24,8 @@ let ``Remove Value`` () =
     let map = add "key1" "value1" map
     let map = remove "key1" map
     let value = getValue "key1" map
-    Assert.Equal(None, value)
+
+    ifEqual None value
 
 [<Fact>]
 let ``foldL should correctly fold the map`` () =
@@ -33,8 +39,7 @@ let ``foldL should correctly fold the map`` () =
         [ (3, "value3")
           (2, "value2")
           (1, "value1") ]
-
-    Assert.Equal<(int * string) list>(expectedValues, foldedValues)
+    ifEqual expectedValues foldedValues
 
 [<Fact>]
 let ``foldR should correctly fold the map`` () =
@@ -48,8 +53,7 @@ let ``foldR should correctly fold the map`` () =
         [ (1, "value1")
           (2, "value2")
           (3, "value3") ]
-
-    Assert.Equal<(int * string) list>(expectedValues, foldedValues)
+    ifEqual expectedValues foldedValues
 
 [<Fact>]
 let ``Filter Values`` () =
@@ -60,12 +64,8 @@ let ``Filter Values`` () =
     let filteredMap = filter (fun (k, v) -> k = "key2") map
     let values = foldL (fun acc (k, v) -> (k, v) :: acc) [] filteredMap
 
-    Assert.Collection(
-        values,
-        fun (k, v) ->
-            Assert.Equal("key2", k)
-            Assert.Equal("value2", v)
-    )
+    let expectedValues = [ ("key2", "value2") ]
+    ifEqual expectedValues values
 
 [<Fact>]
 let ``Merge Maps`` () =
@@ -75,15 +75,17 @@ let ``Merge Maps`` () =
     let map2 = add 2 "value2" map2
     let mergedMap = merge map1 map2
     let values = foldL (fun acc (k, v) -> (k, v) :: acc) [] mergedMap
+
     let expectedValues = [ (2, "value2"); (1, "value1") ]
-    Assert.Equal<(int * string) list>(expectedValues, values)
+    ifEqual expectedValues values
 
 [<Fact>]
 let ``Create Empty Map`` () =
     let map = createEmpty 10
-    Assert.Equal(10, map.Capacity)
-    Assert.Equal(0, map.Size)
-    Assert.True(Array.forall List.isEmpty map.Table)
+    
+    ifEqual 10 map.Capacity
+    ifEqual 0 map.Size
+    ifEqual true (Array.forall List.isEmpty map.Table)
 
 [<Fact>]
 let ``Compare Maps`` () =
@@ -99,5 +101,5 @@ let ``Compare Maps`` () =
     let map3 = add "key1" "value1" map3
     let map3 = add "key3" "value3" map3
 
-    Assert.True(compare map1 map2)
-    Assert.False(compare map1 map3)
+    ifEqual true (compare map1 map2)
+    ifEqual false (compare map1 map3)
