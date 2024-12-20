@@ -39,6 +39,7 @@ let ``foldL should correctly fold the map`` () =
         [ (3, "value3")
           (2, "value2")
           (1, "value1") ]
+
     ifEqual expectedValues foldedValues
 
 [<Fact>]
@@ -53,6 +54,7 @@ let ``foldR should correctly fold the map`` () =
         [ (1, "value1")
           (2, "value2")
           (3, "value3") ]
+
     ifEqual expectedValues foldedValues
 
 [<Fact>]
@@ -82,7 +84,7 @@ let ``Merge Maps`` () =
 [<Fact>]
 let ``Create Empty Map`` () =
     let map = createEmpty 10
-    
+
     ifEqual 10 map.Capacity
     ifEqual 0 map.Size
     ifEqual true (Array.forall List.isEmpty map.Table)
