@@ -76,7 +76,7 @@ let remove (key: 'Key) (map: SeparateChainingHashMap<'Key, 'Value>) : SeparateCh
     // Determine the new size after removal
     let newSize =
         let existingEntry = List.tryFind (fun (k, _) -> k = key) newTable.[index]
-        
+
         match existingEntry with
         | Some _ -> map.Size - 1
         | None -> map.Size
