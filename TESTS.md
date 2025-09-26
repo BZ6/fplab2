@@ -95,6 +95,14 @@ let ``Adding and getting a value should return the same value``
     getValue key map = Some value
 ```
 
+## Какие функциональности вы тестировали и почему
+
+-
+
+## Вывод по работе
+
+-
+
 # Инструкция
 
 Чтобы запустить сборку отчета
